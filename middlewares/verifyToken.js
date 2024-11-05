@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 
+// Middleware verifyToken
 module.exports = function (req, res, next) {
-    const token = req.header('auth-token');
+    const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) return res.status(401).json({ message: 'Access denied' });
 
     try {
@@ -11,4 +12,4 @@ module.exports = function (req, res, next) {
     } catch (error) {
         res.status(400).json({ message: 'Invalid token' });
     }
-}
+};
