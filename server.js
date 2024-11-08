@@ -2,11 +2,32 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const MongoStore = require('connect-mongo');
+const session = require('express-session');
 const app = express();
 
 // //middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors(
+    {
+        origin: 'http://localhost:5173',
+        credentials: true
+    }
+));
+
+app.use(session({
+    name: 'sid',
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.SESSION_SECRET,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 2,
+        secure: false
+    },
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGO_URL
+    })
+}))
 
 // //routes
 const authRoute = require('./routes/auth');

@@ -44,13 +44,36 @@ exports.login = async (req, res) => {
         if (!validPassword) return res.status(400).json({ message: "Invalid password" });
 
         //creation du token
-        const token = jwt.sign(
-            { _id: user._id, role: user.role },
-            process.env.TOKEN_SECRET,
-            { expiresIn: '1h' }
-        )
+        // const token = jwt.sign(
+        //     { _id: user._id, role: user.role },
+        //     process.env.TOKEN_SECRET,
+        //     { expiresIn: '1h' }
+        // )
 
-        res.header('auth-token', token).json({ token })
+        //envoi de la session
+        req.session.user = user;
+
+        res.json({ message: "Login successful" });
+
+        // res.header('auth-token', token).json({ token })
+    } catch (error) {
+        res.status(500).json({ message: error });
+    }
+}
+
+exports.logout = async (req, res) => {
+    try {
+        req.session.destroy();
+        res.json({ message: "Logout successful" });
+    } catch (error) {
+        res.status(500).json({ message: error });
+    }
+}
+
+
+exports.checkAuth = async (req, res) => {
+    try {
+        req.session.user ? res.json({ message: "Authenticated" }) : res.status(401).json({ message: "Not authenticated" });
     } catch (error) {
         res.status(500).json({ message: error });
     }
